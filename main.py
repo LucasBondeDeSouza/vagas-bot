@@ -25,7 +25,7 @@ def salvar_vaga_enviada(link):
 
 def buscar_vagas():
     query = "%20".join(palavras_chave)
-    url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={query}&location=Brasil&sortBy=DD"
+    url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords={query}&location=Brazil&geoId=106057199&sortBy=DD"
     headers = { "User-Agent": "Mozilla/5.0" }
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, "html.parser")
