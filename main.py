@@ -11,6 +11,17 @@ chat_id_usuario = os.environ.get("TELEGRAM_CHAT_ID")
 bot = telebot.TeleBot(CHAVE_API)
 
 palavras_chave = ["frontend", "react", "javascript", "html", "css", "mysql", "postgresql", "python"]
+ARQUIVO_VAGAS_ENVIADAS = "vagas_enviadas.txt"
+
+def carregar_vagas_enviadas():
+    if os.path.exists(ARQUIVO_VAGAS_ENVIADAS):
+        with open(ARQUIVO_VAGAS_ENVIADAS, "r") as f:
+            return set(linha.strip() for linha in f)
+    return set()
+
+def salvar_vaga_enviada(link):
+    with open(ARQUIVO_VAGAS_ENVIADAS, "a") as f:
+        f.write(link + "\n")
 
 def buscar_vagas():
     query = "%20".join(palavras_chave)
@@ -29,9 +40,17 @@ def buscar_vagas():
     return vagas
 
 def enviar_vagas():
+    vagas_enviadas = carregar_vagas_enviadas()
     vagas = buscar_vagas()
-    for titulo, empresa, link in vagas[:5]:  # Envia só as 5 primeiras
-        mensagem = f"💼 *{titulo}*\n🏢 {empresa}\n🔗 {link}"
-        bot.send_message(chat_id_usuario, mensagem, parse_mode="Markdown")
+    novas_vagas = 0
+
+    for titulo, empresa, link in vagas:
+        if link not in vagas_enviadas:
+            mensagem = f"💼 *{titulo}*\n🏢 {empresa}\n🔗 {link}"
+            bot.send_message(chat_id_usuario, mensagem, parse_mode="Markdown")
+            salvar_vaga_enviada(link)
+            novas_vagas += 1
+        if novas_vagas >= 5:
+            break
 
 enviar_vagas()
